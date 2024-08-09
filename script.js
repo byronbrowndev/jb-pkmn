@@ -13,7 +13,7 @@ goButton.addEventListener('click', () => {
     const pokedex = getLocalPokedex();
 
     const pokemon = searchLocalPokedex(nameOrId, pokedex);
-    pokemon ? populateScreen(pokemon) : getBasicPokemonData(nameOrId);
+    pokemon ? populateScreen(pokemon) : getPkmnData(nameOrId);
 });
 
 function getLocalPokedex() {
@@ -22,28 +22,53 @@ function getLocalPokedex() {
     return pokedex;
 } 
 
-function getBasicPokemonData(nameOrId) {
-    fetch('https://jb-pkmn-api-5c3f0f0810fe.herokuapp.com/pokemon/' + nameOrId)
-        .then(res => res.json())
-        .then(data => {
-            // show me the data
-            console.log(data);
-            const pkmnData = extractPkmnData(data);
-            const speciesURL = pkmnData.speciesURL.replace('pokeapi.co/api/v2/', 'jb-pkmn-api-5c3f0f0810fe.herokuapp.com/')
-            fetch(speciesURL)
-                .then(res2 => res2.json())
+function getPkmnData(nameOrId) {
+    getBasicPokemonData$(nameOrId)
+        .then(basicData => {
+            const speciesURL = basicData.speciesURL.replace('pokeapi.co/api/v2/', 'jb-pkmn-api-5c3f0f0810fe.herokuapp.com/')
+            getSpeciesData$(speciesURL)
                 .then(speciesData => {
-                    const evoChainURL = speciesData.evolution_chain.url;
-                    fetch(evoChainURL)
-                        .then(res3 => res3.json())
+                    const evoChainURL = speciesData.evolution_chain.url.replace('pokeapi.co/api/v2/', 'jb-pkmn-api-5c3f0f0810fe.herokuapp.com/');
+                    getEvoData$(evoChainURL)
                         .then(evoData => {
-                            console.log(evoData)
-                            pkmnData.evolution_chain = evoData;
+                            const pkmnData = {
+                                ...basicData,
+                                evolutionChain: evoData
+                            }
                             storeData(pkmnData);
                             populateScreen(pkmnData);
                         })
                 })
-        });
+        })
+}
+
+function getBasicPokemonData$(nameOrId) {
+    return fetch('https://jb-pkmn-api-5c3f0f0810fe.herokuapp.com/pokemon/' + nameOrId)
+        .then(res => res.json())
+        .then(data => {
+            // show me the data
+            console.log(data);
+            // return const pkmnData = extractPkmnData(data);
+            return extractPkmnData(data);
+        })
+}
+
+function getSpeciesData$(speciesURL) {
+    return fetch(speciesURL)
+        .then(res => res.json())
+        .then(speciesData => {
+            console.log(speciesData)
+            return speciesData;
+        })  
+}
+
+function getEvoData$(evoChainURL) {
+    return fetch(evoChainURL)
+        .then(res => res.json())
+        .then(evoData => {
+            console.log(evoData);
+            return evoData;
+    });
 }
 
 function populateScreen(data) {
@@ -70,13 +95,26 @@ function populateScreen(data) {
     // list items for each
     data.abilities.forEach(ability => {
         // create a new list item
-        console.log(ability)
+        // console.log(ability)
         const li = document.createElement('li');
         // add the ability name to that item
         li.innerHTML = ability.ability.name
         // put that item in the list
         abilityList.appendChild(li);
     })
+
+    const evoChain = data.evolutionChain.chain;
+    const chainData = extractChainData(evoChain);
+    console.log(chainData);
+}
+
+function extractChainData(evoChain) {
+    console.log(evoChain);
+    if (!evoChain.evolves_to.length) {
+        return [{ name: evoChain.species.name }];
+    }
+    const chain = extractChainData(evoChain.evolves_to[0]);
+    return [ { name: evoChain.species.name }, ...chain ];
 }
 
 function searchLocalPokedex(nameOrId, pokedex) {
