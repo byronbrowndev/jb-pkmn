@@ -31,9 +31,13 @@ function getPkmnData(nameOrId) {
                     const evoChainURL = speciesData.evolution_chain.url.replace('pokeapi.co/api/v2/', 'jb-pkmn-api-5c3f0f0810fe.herokuapp.com/');
                     getEvoData$(evoChainURL)
                         .then(evoData => {
+                            const evoChain = evoData.chain;
+                            const pkmnSpeciesName = evoData.chain.species.name
+                            const evolutions = extractChainData([pkmnSpeciesName], evoChain);
+
                             const pkmnData = {
                                 ...basicData,
-                                evolutionChain: evoData
+                                evolutions
                             }
                             storeData(pkmnData);
                             populateScreen(pkmnData);
@@ -103,19 +107,39 @@ function populateScreen(data) {
         abilityList.appendChild(li);
     })
 
-    const evoChain = data.evolutionChain.chain;
-    const chainData = extractChainData(evoChain);
-    console.log(chainData);
+    // const evoChain = data.evolutionChain.chain;
+    // const chainData = extractChainData([data.name], evoChain);
+    // console.log(chainData);
 }
 
-function extractChainData(evoChain) {
-    console.log(evoChain);
-    if (!evoChain.evolves_to.length) {
-        return [{ name: evoChain.species.name }];
-    }
-    const chain = extractChainData(evoChain.evolves_to[0]);
-    return [ { name: evoChain.species.name }, ...chain ];
+function extractChainData(currentData, evoChain, options = []) {
+    evoChain.evolves_to.forEach((option, i) => {
+        options[i] = [...currentData, option.species.name];
+        if (option.evolves_to.length > 0) {
+            evoChain.evolves_to.forEach((opt, c) => {
+                extractChainData(options[c], opt, options, c);
+            })
+        }
+    });
+    return options;
 }
+
+function addEvolutions(data, chainData) {
+    return {
+        ...data,
+        evolutions: chainData
+    }
+}
+
+// recursive attempt. works for basic evolutions like bulbasaur will come back later
+// function extractChainData(evoChain) {
+//     console.log(evoChain);
+//     if (!evoChain.evolves_to.length) {
+//         return [{ name: evoChain.species.name }];
+//     }
+//     const chain = extractChainData(evoChain.evolves_to[0]);
+//     return [ { name: evoChain.species.name }, ...chain ];
+// }
 
 function searchLocalPokedex(nameOrId, pokedex) {
     const isId = !(Number.isNaN(+nameOrId));
