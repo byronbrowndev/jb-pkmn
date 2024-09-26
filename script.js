@@ -10,9 +10,7 @@ var abilityList = document.querySelector('#abilityList');
 goButton.addEventListener('click', () => {
     const nameOrId = nameBox.value.trim().toLowerCase();
     nameBox.value = '';
-    const pokedex = getLocalPokedex();
-
-    const pokemon = searchLocalPokedex(nameOrId, pokedex);
+    const pokemon = findPokemonInLS(nameOrId);
     pokemon ? populateScreen(pokemon) : getPkmnData(nameOrId);
 });
 
@@ -22,6 +20,13 @@ function getLocalPokedex() {
     return pokedex;
 } 
 
+function findPokemonInLS(nameOrId) {
+    const pokedex = getLocalPokedex();
+    return searchLocalPokedex(nameOrId, pokedex);
+}
+
+
+// TODO: use refactor to async 
 function getPkmnData(nameOrId) {
     getBasicPokemonData$(nameOrId)
         .then(basicData => {
@@ -31,9 +36,14 @@ function getPkmnData(nameOrId) {
                     const evoChainURL = speciesData.evolution_chain.url.replace('pokeapi.co/api/v2/', 'jb-pkmn-api-5c3f0f0810fe.herokuapp.com/');
                     getEvoData$(evoChainURL)
                         .then(evoData => {
+                            // console.log(evoData);
                             const evoChain = evoData.chain;
-                            const pkmnSpeciesName = evoData.chain.species.name
-                            const evolutions = extractChainData([pkmnSpeciesName], evoChain);
+                            const pkmnSpeciesName = evoChain.species.name;
+                            const firstFormData = {
+                                name: pkmnSpeciesName,
+                                isBaby: evoChain.is_baby
+                            }
+                            const evolutions = extractChainData([firstFormData], evoChain);
 
                             const pkmnData = {
                                 ...basicData,
@@ -114,7 +124,12 @@ function populateScreen(data) {
 
 function extractChainData(currentData, evoChain, options = []) {
     evoChain.evolves_to.forEach((option, i) => {
-        options[i] = [...currentData, option.species.name];
+        const pkmnData = {
+            name: option.species.name,
+            isBaby: option.is_baby,
+            trigger: option.evolution_details[0].trigger.name
+        }
+        options[i] = [...currentData, pkmnData];
         if (option.evolves_to.length > 0) {
             evoChain.evolves_to.forEach((opt, c) => {
                 extractChainData(options[c], opt, options, c);
