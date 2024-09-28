@@ -39,9 +39,12 @@ function getPkmnData(nameOrId) {
                             // console.log(evoData);
                             const evoChain = evoData.chain;
                             const pkmnSpeciesName = evoChain.species.name;
+                            const splitUrlArray = evoChain.species.url.split('/');
+                            const pkmnSpeciesId = parseInt(splitUrlArray[splitUrlArray.length-2]);
                             const firstFormData = {
                                 name: pkmnSpeciesName,
-                                isBaby: evoChain.is_baby
+                                isBaby: evoChain.is_baby,
+                                id: pkmnSpeciesId
                             }
                             const evolutions = extractChainData([firstFormData], evoChain);
 
@@ -90,14 +93,10 @@ function populateScreen(data) {
     nameSquare.innerHTML = data.name;
     pokedexNumber.innerHTML = data.pokedexEntry;
 
-    // get type 1
     const type1 = data.types[0].type.name;
-    // put it on the screen
     type1Area.innerHTML = type1;
 
-    // if there is a type 2
     if (data.types.length > 1) {
-        // get type 2 put it on the screen
         const type2 = data.types[1].type.name;
         type2Area.innerHTML = type2;
     } else {
@@ -106,28 +105,47 @@ function populateScreen(data) {
 
 
     abilityList.innerHTML = '';
-    // list items for each
     data.abilities.forEach(ability => {
-        // create a new list item
-        // console.log(ability)
         const li = document.createElement('li');
-        // add the ability name to that item
         li.innerHTML = ability.ability.name
-        // put that item in the list
         abilityList.appendChild(li);
     })
+
+    const evolutionSection = document.querySelector('#evolutions');
+    evolutionSection.innerHTML = '';
+
+    data.evolutions.forEach((evolutionChain) => {
+        const div = document.createElement('div');
+        evolutionChain.forEach((form) => {
+            const formDiv = `
+            <div style="display:inline-block;">
+                <img src="${'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' + form.id + '.png'}">
+                <div id="name">${form.name}</div>
+                <div id="trigger">${form.trigger ? form.trigger : form.isBaby ? 'baby form' : 'base form'}</div>
+                <div>${populateTriggerDetails(form.triggerDetails)}</div>
+            </div>
+            `
+            div.innerHTML = div.innerHTML + formDiv;
+        })
+        evolutionSection.append(div);
+    });
+
 
     // const evoChain = data.evolutionChain.chain;
     // const chainData = extractChainData([data.name], evoChain);
     // console.log(chainData);
 }
 
-function extractChainData(currentData, evoChain, options = []) {
+function extractChainData(currentData, evoChain, options = [], ting = 0) {
     evoChain.evolves_to.forEach((option, i) => {
+        const splitUrlArray = option.species.url.split('/');
+        const pkmnSpeciesId = parseInt(splitUrlArray[splitUrlArray.length-2]);
         const pkmnData = {
             name: option.species.name,
             isBaby: option.is_baby,
-            trigger: option.evolution_details[0].trigger.name
+            trigger: !!(option.evolution_details[0].trigger.name) && option.evolution_details[0].trigger.name,
+            triggerDetails: getTriggerDetails(option.evolution_details[0]),
+            id: pkmnSpeciesId
         }
         options[i] = [...currentData, pkmnData];
         if (option.evolves_to.length > 0) {
@@ -137,6 +155,34 @@ function extractChainData(currentData, evoChain, options = []) {
         }
     });
     return options;
+}
+
+function getTriggerDetails(details) {
+    const relevantData = {};
+    for (const propKey in details) {
+        if (propKey === 'trigger') {
+            continue;
+        }
+        if (!details[propKey]) {
+            continue;
+        }
+        relevantData[propKey] = details[propKey]
+    }
+    return relevantData;
+}
+
+function populateTriggerDetails(details) {
+    let detailString = ""
+    if (details && JSON.stringify(details) === '{}')
+        return detailString
+    for(detailKey in details) {
+        if (typeof details[detailKey] === 'object') {
+            detailString += detailKey + ': ' + details[detailKey].name + ' ';
+        } else {
+            detailString += detailKey + ': ' + details[detailKey] + ' ';
+        }
+    }
+    return detailString;
 }
 
 function addEvolutions(data, chainData) {
