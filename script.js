@@ -30,10 +30,11 @@ function findPokemonInLS(nameOrId) {
 function getPkmnData(nameOrId) {
     getBasicPokemonData$(nameOrId)
         .then(basicData => {
-            const speciesURL = basicData.speciesURL.replace('pokeapi.co/api/v2/', 'jb-pkmn-api-5c3f0f0810fe.herokuapp.com/')
-            getSpeciesData$(speciesURL)
+            // bypass the old api
+            // const speciesURL = basicData.speciesURL.replace('pokeapi.co/api/v2/', 'jb-pkmn-api-5c3f0f0810fe.herokuapp.com/')
+            getSpeciesData$(basicData.speciesURL)
                 .then(speciesData => {
-                    const evoChainURL = speciesData.evolution_chain.url.replace('pokeapi.co/api/v2/', 'jb-pkmn-api-5c3f0f0810fe.herokuapp.com/');
+                    const evoChainURL = speciesData.evolution_chain.url //.replace('pokeapi.co/api/v2/', 'jb-pkmn-api-5c3f0f0810fe.herokuapp.com/');
                     getEvoData$(evoChainURL)
                         .then(evoData => {
                             // console.log(evoData);
@@ -60,7 +61,7 @@ function getPkmnData(nameOrId) {
 }
 
 function getBasicPokemonData$(nameOrId) {
-    return fetch('https://jb-pkmn-api-5c3f0f0810fe.herokuapp.com/pokemon/' + nameOrId)
+    return fetch('https://pokeapi.co/api/v2/pokemon/' + nameOrId)
         .then(res => res.json())
         .then(data => {
             // show me the data
