@@ -6,216 +6,250 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Julius' Pokemon App</title>
     <style>
-        .type-table th,
-        .type-table td {
-            padding: 0;
-            border: 1px solid #f0f0f0
+        :root {
+            --bg-page: #f4f7ea;
+            --bg-panel-top: #d8dfc4;
+            --bg-panel-bottom: #b9c699;
+            --border-main: #4a5d23;
+            --border-dark: #2f3c18;
+            --header-bg: #d9e6b9;
+            --header-highlight: #f4fadc;
+            --text-main: #1f2a12;
+            --text-light: #f7f7f2;
+            --accent-blue-top: #3f5f9a;
+            --accent-blue-bottom: #2f4772;
         }
 
-        .cell-atkdef {
-            font-size: .625rem;
-            font-weight: normal;
-            line-height: 1
+        * {
+            box-sizing: border-box;
         }
 
-        .type-cell {
-            display: block;
-            width: 66px;
-            height: 28px;
-            font-size: .625rem;
-            margin-bottom: 0;
-            line-height: 26px
+        body {
+            margin: 0;
+            padding: 12px;
+            background: linear-gradient(180deg, #f7f9f0, var(--bg-page));
+            color: var(--text-main);
+            font-family: "Verdana", "Tahoma", sans-serif;
+            line-height: 1.35;
         }
 
-        .type-abbr {
-            width: 28px
+        h1 {
+            margin: 0 0 10px;
+            font-size: 1.3rem;
+            line-height: 1.15;
         }
 
-        .type-fx-cell,
-        .type-fx-icon {
-            color: #ffdd57;
-            font-size: .625rem;
-            width: 28px;
-            height: 28px;
-            line-height: 26px;
-            text-align: center
+        #nameOrId {
+            width: 100%;
+            max-width: 360px;
+            padding: 8px 10px;
+            border: 2px solid var(--border-main);
+            border-radius: 8px;
+            background: #f9fde8;
+            color: var(--text-main);
+            margin-bottom: 8px;
         }
 
-        .type-fx-icon {
+        #go {
             display: inline-block;
-            border: 1px solid #f0f0f0
+            margin-left: 0;
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            border: 2px solid var(--border-main);
+            border-radius: 8px;
+            background: linear-gradient(180deg, #f4fadc, #c7d59e);
+            color: #1e2812;
+            font-weight: 700;
+            cursor: pointer;
         }
 
-        .type-fx-25,
-        .type-fx-50 {
-            font-size: .75rem
+        section {
+            margin: 8px 0;
         }
 
-        .type-fx-null {
-            background-color: #f0f0f0
+        #pkmnImg {
+            max-width: 100%;
+            height: auto;
         }
 
-        .type-fx-0 {
-            background-color: #2e3436
+        #typeChart {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 4px;
         }
 
-        .type-fx-25 {
-            background-color: #7c0000
-        }
-
-        .type-fx-50 {
-            background-color: #a40000
-        }
-
-        .type-fx-100 {
-            background-color: #fff
-        }
-
-        .type-fx-200 {
-            background-color: #4e9a06
-        }
-
-        .type-fx-400 {
-            background-color: #73d216
-        }
-
-        @media(min-width: 900px) {
-
-            .type-cell,
-            .type-fx-cell,
-            .type-fx-icon {
-                height: 36px;
-                font-size: .75rem;
-                line-height: 34px
-            }
-
-            .type-abbr,
-            .type-fx-cell,
-            .type-fx-icon {
-                width: 36px
-            }
-
-            .cell-atkdef {
-                line-height: 1.2
-            }
-
-            .type-fx-cell,
-            .type-fx-icon {
-                font-size: .75rem
-            }
-
-            .type-fx-25,
-            .type-fx-50 {
-                font-size: .875rem
-            }
-        }
-
-        .type-fx-list {
-            margin-left: 1.75rem
-        }
-
-        .cell-dual-type {
-            display: flex
-        }
-
-        .cell-dual-type .type-icon:first-child {
-            margin-right: 1px
-        }
-
-        .type-table .cell-total {
-            padding: 0 10px
-        }
-
-        .has-pkmn>.cell-total {
-            cursor: pointer
-        }
-
-        .has-pkmn>.cell-total:hover {
-            background-color: #fffacd;
-            text-decoration: underline
-        }
-
-        .modal-content>table {
-            margin-bottom: 0
-        }
-
-        .type-table-dense .type-cell,
-        .type-table-dense .type-fx-cell,
-        .type-table-dense .type-fx-icon {
-            height: 26px;
-            font-size: .625rem;
-            line-height: 24px
-        }
-
-        .type-table-dense .type-abbr,
-        .type-table-dense .type-fx-cell,
-        .type-table-dense .type-fx-icon {
-            width: 26px
-        }
-
-        .infocard-list-types>.infocard {
-            width: 168px
-        }
-
-        @supports(display: grid) {
-            .infocard-list-types {
-                grid-template-columns: repeat(auto-fit, minmax(160px, 1fr))
-            }
-        }
-
-        .type-table-pokedex {
-            display: inline-block;
-            margin: 0 0 0 -1px
-        }
-
-        // this was generated with co-pilot
         .type-table {
             border-collapse: separate;
             border-spacing: 2px;
-            background: linear-gradient(180deg, #d8dfc4, #b9c699);
-            border: 4px solid #4a5d23;
-            padding: 8px;
-            border-radius: 10px;
-            box-shadow: 0 3px 0 #2f3c18, 0 8px 14px rgba(34, 42, 20, 0.35);
-            font-family: "Verdana", "Tahoma", sans-serif;
+            background: linear-gradient(180deg, var(--bg-panel-top), var(--bg-panel-bottom));
+            border: 3px solid var(--border-main);
+            padding: 6px;
+            border-radius: 8px;
+            box-shadow: 0 2px 0 var(--border-dark), 0 6px 12px rgba(34, 42, 20, 0.28);
+            min-width: 700px;
         }
 
         .type-table th,
         .type-table td {
-            border: 1px solid #4a5d23;
+            padding: 0;
+            border: 1px solid var(--border-main);
             border-radius: 4px;
             overflow: hidden;
         }
 
         .type-table thead th {
-            background: #d9e6b9;
-            box-shadow: inset 0 1px 0 #f4fadc;
+            background: var(--header-bg);
+            box-shadow: inset 0 1px 0 var(--header-highlight);
+        }
+
+        .cell-atkdef {
+            font-size: .6rem;
+            font-weight: 700;
+            line-height: 1.1;
         }
 
         .type-table .cell-atkdef {
-            color: #f7f7f2;
-            background: linear-gradient(180deg, #3f5f9a, #2f4772);
+            color: var(--text-light);
+            background: linear-gradient(180deg, var(--accent-blue-top), var(--accent-blue-bottom));
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            width: 90px;
-            font-weight: 700;
+            width: 82px;
             text-shadow: 0 1px 0 rgba(0, 0, 0, 0.45);
         }
 
+        .type-cell {
+            display: block;
+            width: 26px;
+            height: 26px;
+            font-size: .6rem;
+            margin-bottom: 0;
+            line-height: 24px;
+            text-align: center;
+        }
+
+        .type-abbr {
+            width: 26px;
+        }
+
         .type-table .type-abbr {
-            width: 34px;
             font-weight: 700;
-            color: #ffffff;
+            color: #fff;
             text-shadow: 0 1px 0 rgba(0, 0, 0, 0.45);
             border: 1px solid rgba(0, 0, 0, 0.35);
             box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22);
         }
 
+        .type-fx-cell,
+        .type-fx-icon {
+            color: #ffdd57;
+            font-size: .6rem;
+            width: 26px;
+            height: 26px;
+            line-height: 24px;
+            text-align: center;
+        }
+
         .type-table .type-fx-cell {
             font-weight: 700;
-            color: #f7f7f2;
+            color: var(--text-light);
             text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
             border-color: #5b6f2d;
+        }
+
+        .type-fx-icon {
+            display: inline-block;
+            border: 1px solid var(--border-main);
+        }
+
+        .type-fx-25,
+        .type-fx-50 {
+            font-size: .7rem;
+        }
+
+        .type-fx-null {
+            background-color: #f0f0f0;
+        }
+
+        .type-fx-0 {
+            background-color: #2e3436;
+        }
+
+        .type-fx-25 {
+            background-color: #7c0000;
+        }
+
+        .type-fx-50 {
+            background-color: #a40000;
+        }
+
+        .type-fx-100 {
+            background-color: #fff;
+        }
+
+        .type-fx-200 {
+            background-color: #4e9a06;
+        }
+
+        .type-fx-400 {
+            background-color: #73d216;
+        }
+
+        .type-fx-list {
+            margin-left: 1.25rem;
+        }
+
+        .cell-dual-type {
+            display: flex;
+        }
+
+        .cell-dual-type .type-icon:first-child {
+            margin-right: 1px;
+        }
+
+        .type-table .cell-total {
+            padding: 0 8px;
+        }
+
+        .has-pkmn>.cell-total {
+            cursor: pointer;
+        }
+
+        .has-pkmn>.cell-total:hover {
+            background-color: #fffacd;
+            text-decoration: underline;
+        }
+
+        .modal-content>table {
+            margin-bottom: 0;
+        }
+
+        .type-table-dense .type-cell,
+        .type-table-dense .type-fx-cell,
+        .type-table-dense .type-fx-icon {
+            height: 24px;
+            font-size: .56rem;
+            line-height: 22px;
+        }
+
+        .type-table-dense .type-abbr,
+        .type-table-dense .type-fx-cell,
+        .type-table-dense .type-fx-icon {
+            width: 24px;
+        }
+
+        .infocard-list-types>.infocard {
+            width: 168px;
+        }
+
+        @supports(display: grid) {
+            .infocard-list-types {
+                grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            }
+        }
+
+        .type-table-pokedex {
+            display: inline-block;
+            margin: 0 0 0 -1px;
         }
 
         .type-table .type-cell {
@@ -240,7 +274,88 @@
         .type-dark { background-color: #705848; }
         .type-steel { background-color: #b8b8d0; color: #36404f; text-shadow: none; }
         .type-fairy { background-color: #ee99ac; }
-        // this is the end of the copilot edit
+
+        @media (min-width: 600px) {
+            body {
+                padding: 16px;
+            }
+
+            h1 {
+                font-size: 1.55rem;
+            }
+
+            #nameOrId {
+                width: 280px;
+                margin-right: 6px;
+                margin-bottom: 0;
+            }
+
+            #go {
+                margin-bottom: 0;
+            }
+
+            .type-table {
+                padding: 8px;
+            }
+
+            .type-cell,
+            .type-fx-cell,
+            .type-fx-icon {
+                height: 30px;
+                font-size: .68rem;
+                line-height: 28px;
+            }
+
+            .type-abbr,
+            .type-fx-cell,
+            .type-fx-icon {
+                width: 30px;
+            }
+
+            .type-table .cell-atkdef {
+                width: 88px;
+            }
+        }
+
+        @media (min-width: 900px) {
+            body {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.9rem;
+            }
+
+            .type-table {
+                border-width: 4px;
+                border-radius: 10px;
+                padding: 10px;
+            }
+
+            .type-cell,
+            .type-fx-cell,
+            .type-fx-icon {
+                height: 36px;
+                font-size: .75rem;
+                line-height: 34px;
+            }
+
+            .type-abbr,
+            .type-fx-cell,
+            .type-fx-icon {
+                width: 36px;
+            }
+
+            .cell-atkdef {
+                line-height: 1.2;
+                font-size: .625rem;
+            }
+
+            .type-fx-25,
+            .type-fx-50 {
+                font-size: .875rem;
+            }
+        }
     </style>
 </head>
 
