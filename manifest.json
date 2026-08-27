@@ -1,0 +1,24 @@
+{
+  "name": "Julius' Pokemon Database",
+  "short_name": "JB Pkmn",
+  "description": "Search Pokemon data, abilities, and evolutions.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f4f7ea",
+  "theme_color": "#4a5d23",
+  "icons": [
+    {
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

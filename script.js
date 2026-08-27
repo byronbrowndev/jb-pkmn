@@ -227,3 +227,12 @@ function storeData(data) {
     const nationalPokedexString = JSON.stringify(nationalPokedex);
     localStorage.setItem('pokedex', nationalPokedexString);
 }
+
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./service-worker.js')
+            .catch((error) => {
+                console.error('Service worker registration failed:', error);
+            });
+    });
+}
