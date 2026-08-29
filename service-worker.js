@@ -1,12 +1,12 @@
-const CACHE_NAME = 'jb-pkmn-v2';
+const CACHE_NAME = 'jb-pkmn-v3';
 const CORE_ASSETS = [
     './',
     './index.html',
     './script.js',
     './style.css',
     './manifest.json',
-    './icons/icon-192.png',
-    './icons/icon-512.png'
+    './icons/icon-192.png?v=3',
+    './icons/icon-512.png?v=3'
 ];
 
 self.addEventListener('install', (event) => {
