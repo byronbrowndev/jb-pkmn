@@ -152,6 +152,7 @@ function populateScreen(data) {
     data.evolutions.forEach((evolutionChain) => {
         const div = document.createElement('div');
         evolutionChain.forEach((form) => {
+            // removed trigger details
             // const formDiv = `
             // <div style="display:inline-block;">
             //     <img src="${'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' + form.id + '.png'}">
@@ -159,7 +160,6 @@ function populateScreen(data) {
             //     <div id="trigger">${form.trigger ? form.trigger : form.isBaby ? 'baby form' : 'base form'}</div>
             // </div>
             // `
-            // removed trigger details
             const formDiv = `
             <div style="display:inline-block;">
                 <img src="${'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' + form.id + '.png'}">
